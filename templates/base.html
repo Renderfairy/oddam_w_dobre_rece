@@ -1,0 +1,26 @@
+{% load static %}
+<html lang="pl">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>{% block title %}{% endblock %}</title>
+
+    {% block styles %}
+        <link rel="stylesheet" href="{% static '../static/css/style.css' %}"/>
+    {% endblock %}
+
+    {% block scripts %}
+        <script src="{% static '../static/js/app.js' %}"></script>
+    {% endblock %}
+</head>
+<body>
+{% include 'navbar.html' %}
+
+{% block container %}
+
+{% endblock %}
+
+{% include 'footer.html' %}
+</body>
+</html>
