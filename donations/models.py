@@ -9,12 +9,18 @@ from . import enums
 class Category(models.Model):
     name = models.CharField(max_length=60)
 
+    def __str__(self):
+        return self.name
+
 
 class Institution(models.Model):
     name = models.CharField(max_length=120)
     description = models.TextField()
     type = models.SmallIntegerField(choices=enums.OrganisationType.CHOICES, default=0)
     categories = models.ManyToManyField('Category', related_name='institutions')
+
+    def __str__(self):
+        return self.name
 
 
 class Donation(models.Model):
@@ -29,3 +35,6 @@ class Donation(models.Model):
     picup_time = models.TimeField()
     picup_comment = models.TextField()
     user = models.ForeignKey(get_user_model(), null=True, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f'{self.user} {self.institution}'
