@@ -1,5 +1,7 @@
+from django.contrib.auth import get_user_model, authenticate, login
+from django.contrib.auth.views import LoginView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView
 from django.db.models import Sum
@@ -44,9 +46,24 @@ class AddDonationView(TemplateView):
         return context
 
 
-class LoginView(TemplateView):
+class DonationsLoginView(LoginView):
 
     template_name = 'donations/login.html'
+    authentication_form = forms.UserLoginForm
+    # redirect_authenticated_user = reverse_lazy('donations:landing_page')
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            if user.is_active:
+                login(self.request, form.get_user())
+                return redirect(reverse_lazy('donations:landing_page'))
+        else:
+            return redirect(reverse_lazy('donations:register'))
 
 
 class RegisterView(SuccessMessageMixin, CreateView):
@@ -54,3 +71,5 @@ class RegisterView(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('donations:login')
     form_class = forms.UserRegisterForm
     success_message = 'Twoje konto zostało stworzone'
+
+
