@@ -235,6 +235,31 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$step.parentElement.hidden = this.currentStep >= 6;
 
       // TODO: get data from inputs and show them in summary
+
+      function show_id(event) {
+        const ids = get_checked_checkboxes();
+        const params = new URLSearchParams();
+        ids.forEach(id => params.append("category_ids", id));
+        const address = '/donation?'+ params.toString();
+        fetch(address)
+            .then(response => response.text())
+            .then(data => document.getElementById("category-checkbox").innerHTML = data);
+      }
+
+      function get_checked_checkboxes()
+      {
+        const markedCheckbox = document.querySelectorAll('input[type="checkbox"]:checked');
+        let ids = [];
+        markedCheckbox.forEach(box => ids.push(box.value));
+        console.log(ids);
+        return ids;
+      }
+
+      // this.$form(function () {
+      //   let span_buttons = $('.checkbox');
+      //   span_buttons.click();
+      // });
+
     }
 
     /**

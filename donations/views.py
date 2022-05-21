@@ -1,10 +1,12 @@
-from django.contrib.auth import get_user_model, authenticate, login
-from django.contrib.auth.views import LoginView
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, CreateView
 from django.db.models import Sum
+from django.db.models.functions import Length
 
 
 from random import sample
@@ -36,13 +38,22 @@ class LandingPageView(TemplateView):
         return context
 
 
-class AddDonationView(TemplateView):
+class AddDonationView(LoginRequiredMixin, CreateView):
+    login_url = reverse_lazy('donations:login')
+    form_class = forms.AddDonationForm
     template_name = 'donations/form.html'
 
     def get_context_data(self, **kwargs):
+        category_ids = self.request.GET.getlist('categories_ids')
         context = super(AddDonationView, self).get_context_data(**kwargs)
         context['css_class'] = 'header--form-page'
-
+        context['categories'] = models.Category.objects.all().order_by(Length('name')).reverse()
+        context['category_ids'] = category_ids
+        print(category_ids)
+        if category_ids is not None:
+            context['institutions'] = models.Institution.objects.filter(categories__institutions__in=category_ids).distinct()
+        else:
+            context['institutions'] = models.Institution.objects.all()
         return context
 
 
@@ -50,7 +61,6 @@ class DonationsLoginView(LoginView):
 
     template_name = 'donations/login.html'
     authentication_form = forms.UserLoginForm
-    # redirect_authenticated_user = reverse_lazy('donations:landing_page')
 
     def form_valid(self, form):
         username = form.cleaned_data.get('username')
@@ -64,6 +74,10 @@ class DonationsLoginView(LoginView):
                 return redirect(reverse_lazy('donations:landing_page'))
         else:
             return redirect(reverse_lazy('donations:register'))
+
+
+class DonationsLogoutView(LogoutView):
+    next_page = reverse_lazy('donations:landing_page')
 
 
 class RegisterView(SuccessMessageMixin, CreateView):

@@ -45,12 +45,14 @@ INSTALLED_APPS = [
 
     # 3rd party
     'phonenumber_field',
+    'debug_toolbar',
     # local
     'donations.apps.DonationsConfig',
 
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -147,6 +149,6 @@ STATICFILES_FINDERS = [
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+LOGIN_URL = 'donations:login'
 LOGIN_REDIRECT_URL = 'donations:landing_page'
 LOGOUT_REDIRECT_URL = 'donations:login'

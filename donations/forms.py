@@ -1,8 +1,11 @@
 from django import forms
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.db.models.functions import Length
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+
+from . import models
 
 
 class UserRegisterForm(UserCreationForm):
@@ -50,3 +53,25 @@ class UserLoginForm(AuthenticationForm):
         return super(UserLoginForm, self).clean()
 
 
+class AddDonationForm(forms.ModelForm):
+    class Meta:
+        model = models.Donation
+        fields = [
+            'quantity',
+            'address',
+            'phone_number',
+            'city',
+            'zip_code',
+            'picup_date',
+            'picup_time',
+            'picup_comment',
+        ]
+        widgets = {
+            'quantity': forms.NumberInput(attrs={'name': 'bags', 'step': '1', 'min': '1'}),
+        }
+
+
+# class CategoryForm(forms.ModelForm):
+#     class Meta:
+#         model = models.Category
+#         fields = ['name']
