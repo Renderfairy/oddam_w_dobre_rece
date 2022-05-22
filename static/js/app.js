@@ -197,9 +197,26 @@ document.addEventListener("DOMContentLoaded", function() {
         btn.addEventListener("click", e => {
           e.preventDefault();
           this.currentStep++;
+          // tu dać funkcję na filtrowanie organizacji
+          let ids = get_checked_checkboxes();
+          let params = new URLSearchParams();
+          ids.forEach(id => params.append("category_ids", id));
+          let address = '/donation?'+ params.toString();
+          fetch(address)
+              .then(response => response.text())
+              .then(data => document.getElementsByName("organization").innerHTML = data)
+
           this.updateForm();
         });
       });
+
+      function get_checked_checkboxes() {
+        const checkboxes = document.querySelectorAll('input[name="categories"]:checked');
+        const ids = [];
+        checkboxes.forEach(checkbox => ids.push(checkbox.value));
+        console.log(ids);
+        return ids
+      }
 
       // Previous step
       this.$prev.forEach(btn => {
@@ -233,33 +250,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
       this.$stepInstructions[0].parentElement.parentElement.hidden = this.currentStep >= 6;
       this.$step.parentElement.hidden = this.currentStep >= 6;
-
-      // TODO: get data from inputs and show them in summary
-
-      function show_id(event) {
-        const ids = get_checked_checkboxes();
-        const params = new URLSearchParams();
-        ids.forEach(id => params.append("category_ids", id));
-        const address = '/donation?'+ params.toString();
-        fetch(address)
-            .then(response => response.text())
-            .then(data => document.getElementById("category-checkbox").innerHTML = data);
-      }
-
-      function get_checked_checkboxes()
-      {
-        const markedCheckbox = document.querySelectorAll('input[type="checkbox"]:checked');
-        let ids = [];
-        markedCheckbox.forEach(box => ids.push(box.value));
-        console.log(ids);
-        return ids;
-      }
-
-      // this.$form(function () {
-      //   let span_buttons = $('.checkbox');
-      //   span_buttons.click();
-      // });
-
     }
 
     /**

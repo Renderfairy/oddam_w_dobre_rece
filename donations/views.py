@@ -44,7 +44,7 @@ class AddDonationView(LoginRequiredMixin, CreateView):
     template_name = 'donations/form.html'
 
     def get_context_data(self, **kwargs):
-        category_ids = self.request.GET.getlist('categories_ids')
+        category_ids = self.request.GET.getlist('category_ids')
         context = super(AddDonationView, self).get_context_data(**kwargs)
         context['css_class'] = 'header--form-page'
         context['categories'] = models.Category.objects.all().order_by(Length('name')).reverse()
@@ -52,6 +52,7 @@ class AddDonationView(LoginRequiredMixin, CreateView):
         print(category_ids)
         if category_ids is not None:
             context['institutions'] = models.Institution.objects.filter(categories__institutions__in=category_ids).distinct()
+            print(context['institutions'])
         else:
             context['institutions'] = models.Institution.objects.all()
         return context
