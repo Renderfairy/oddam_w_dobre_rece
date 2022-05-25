@@ -197,14 +197,24 @@ document.addEventListener("DOMContentLoaded", function() {
         btn.addEventListener("click", e => {
           e.preventDefault();
           this.currentStep++;
-          // tu dać funkcję na filtrowanie organizacji
+
           let ids = get_checked_checkboxes();
           let params = new URLSearchParams();
           ids.forEach(id => params.append("category_ids", id));
           let address = '/donation?'+ params.toString();
           fetch(address)
               .then(response => response.text())
-              .then(data => document.getElementsByName("organization").innerHTML = data)
+              .then(data => document.getElementById("inst").innerHTML = data)
+
+          let formData = new FormData(document.getElementById('addDonation'));
+          let dataList = []
+
+          formData.forEach(field => dataList.push(field))
+          console.log(formData.values())
+          console.log(dataList)
+          // for (let field of formData) {
+          //   console.log(field[0], field[1])
+          // }
 
           this.updateForm();
         });

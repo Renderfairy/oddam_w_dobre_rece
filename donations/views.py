@@ -2,11 +2,14 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import TemplateView, CreateView
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.db.models.functions import Length
+from django.db.models import F
 
 
 from random import sample
@@ -38,24 +41,32 @@ class LandingPageView(TemplateView):
         return context
 
 
-class AddDonationView(LoginRequiredMixin, CreateView):
+class AddDonationView(LoginRequiredMixin, View):
     login_url = reverse_lazy('donations:login')
-    form_class = forms.AddDonationForm
-    template_name = 'donations/form.html'
 
-    def get_context_data(self, **kwargs):
+    def get(self, request):
         category_ids = self.request.GET.getlist('category_ids')
-        context = super(AddDonationView, self).get_context_data(**kwargs)
-        context['css_class'] = 'header--form-page'
-        context['categories'] = models.Category.objects.all().order_by(Length('name')).reverse()
-        context['category_ids'] = category_ids
-        print(category_ids)
-        if category_ids is not None:
-            context['institutions'] = models.Institution.objects.filter(categories__institutions__in=category_ids).distinct()
-            print(context['institutions'])
+        form = forms.AddDonationForm
+        categories = models.Category.objects.all().order_by(Length('name')).reverse()
+        institutions = models.Institution.objects.all()
+        if len(category_ids) != 0 and category_ids is not None:
+            institutions = models.Institution.objects.filter(categories__institutions__in=category_ids).distinct('categories__institutions')
+            print({'categories': categories, 'institutions': institutions, 'form': form})
+            return render(request, 'api_intitutions.html', {'categories': categories, 'institutions': institutions, 'form': form})
+
+        return render(request, 'donations/form.html', {'categories': categories, 'institutions': institutions, 'form': form})
+
+    def post(self, request):
+        form = forms.AddDonationForm(request.POST or None)
+        if form.is_valid():
+            donation = form.save(commit=False)
+            donation.user = request.user
+            print(donation)
+            donation.save()
+            return redirect(reverse_lazy('donations:landing_page'))
         else:
-            context['institutions'] = models.Institution.objects.all()
-        return context
+            form = forms.AddDonationForm
+            return render(request, 'donations/form.html', {'form': form})
 
 
 class DonationsLoginView(LoginView):

@@ -5,6 +5,8 @@ from django.db.models.functions import Length
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 
+from phonenumber_field.formfields import PhoneNumberField
+
 from . import models
 
 
@@ -53,13 +55,22 @@ class UserLoginForm(AuthenticationForm):
         return super(UserLoginForm, self).clean()
 
 
+class DatePickerInput(forms.DateInput):
+    input_type = 'date'
+
+
+class TimePickerInput(forms.TimeInput):
+    input_type = 'time'
+
+
 class AddDonationForm(forms.ModelForm):
+    phone_number = PhoneNumberField(widget=forms.TextInput(attrs={'name': 'phone', 'type': 'phone'}))
+
     class Meta:
         model = models.Donation
         fields = [
             'quantity',
             'address',
-            'phone_number',
             'city',
             'zip_code',
             'picup_date',
@@ -68,6 +79,12 @@ class AddDonationForm(forms.ModelForm):
         ]
         widgets = {
             'quantity': forms.NumberInput(attrs={'name': 'bags', 'step': '1', 'min': '1'}),
+            'address': forms.TextInput(attrs={'name': 'address', 'placeholder': 'Dobra 1/3'}),
+            'city': forms.TextInput(attrs={'name': 'city'}),
+            'zip_code': forms.TextInput(attrs={'name': 'postcode', 'placeholder': '00-000'}),
+            'picup_date': DatePickerInput(attrs={'name': 'data'}),
+            'picup_time': TimePickerInput(attrs={'name': 'time'}),
+            'picup_comment': forms.Textarea(attrs={'name': 'more_info', 'rows': '5'})
         }
 
 

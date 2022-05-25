@@ -29,8 +29,9 @@
         <div class="form--steps-container">
             <div class="form--steps-counter">Krok <span>1</span>/5</div>
 
-            <form action="form-confirmation.html" method="POST">
+            <form action="" method="POST" enctype="multipart/form-data" id="addDonation">
                 <!-- STEP 1: class .active is switching steps -->
+            {% csrf_token %}
                 <div data-step="1" class="active">
                     <h3>Zaznacz co chcesz oddać:</h3>
                     {% for category in categories %}
@@ -76,32 +77,9 @@
                 <!-- STEP 4 -->
                 <div data-step="3">
                     <h3>Wybierz organizacje, której chcesz pomóc:</h3>
+                    <div id="inst">
 
-                        <div class="form-group form-group--checkbox" data-id="institution">
-                            <label>
-                                {% for institution in institutions %}
-                                <input type="radio" name="organization" value="old"/>
-                                <span class="checkbox radio"></span>
-                                <span class="description">
-                                    <div class="title">{{ institution.name }}</div>
-                                    <div class="subtitle">{{ institution.description }}</div>
-                                </span>
-                            {% endfor %}
-                            </label>
-                        </div>
-
-{##}
-{#                    <div class="form-group form-group--checkbox">#}
-{#                        <label>#}
-{#                            <input type="radio" name="organization" value="old"/>#}
-{#                            <span class="checkbox radio"></span>#}
-{#                            <span class="description">#}
-{#                  <div class="title">{{ form.institution }}</div>#}
-{#                  <div class="subtitle">{{ form.institution }}#}
-{#                  </div>#}
-{#                </span>#}
-{#                        </label>#}
-{#                    </div>#}
+                    </div>
 
                     <div class="form-group form-group--buttons">
                         <button type="button" class="btn prev-step">Wstecz</button>
@@ -117,22 +95,22 @@
                         <div class="form-section--column">
                             <h4>Adres odbioru</h4>
                             <div class="form-group form-group--inline">
-                                <label> Ulica <input type="text" name="address"/> </label>
+                                <label> Ulica {{ form.address }} </label>
                             </div>
 
                             <div class="form-group form-group--inline">
-                                <label> Miasto <input type="text" name="city"/> </label>
+                                <label> Miasto {{ form.city }} </label>
                             </div>
 
                             <div class="form-group form-group--inline">
                                 <label>
-                                    Kod pocztowy <input type="text" name="postcode"/>
+                                    Kod pocztowy {{ form.zip_code }}
                                 </label>
                             </div>
 
                             <div class="form-group form-group--inline">
                                 <label>
-                                    Numer telefonu <input type="phone" name="phone"/>
+                                    Numer telefonu {{ form.phone_number }}
                                 </label>
                             </div>
                         </div>
@@ -140,17 +118,17 @@
                         <div class="form-section--column">
                             <h4>Termin odbioru</h4>
                             <div class="form-group form-group--inline">
-                                <label> Data <input type="date" name="data"/> </label>
+                                <label> Data {{ form.picup_date }} </label>
                             </div>
 
                             <div class="form-group form-group--inline">
-                                <label> Godzina <input type="time" name="time"/> </label>
+                                <label> Godzina {{ form.picup_time }} </label>
                             </div>
 
                             <div class="form-group form-group--inline">
                                 <label>
                                     Uwagi dla kuriera
-                                    <textarea name="more_info" rows="5"></textarea>
+                                    {{ form.picup_comment }}
                                 </label>
                             </div>
                         </div>
@@ -179,7 +157,7 @@
                                 <li>
                                     <span class="icon icon-hand"></span>
                                     <span class="summary--text"
-                                    >Dla fundacji "Mam marzenie" w Warszawie</span
+                                    >Wybrana instytucja</span
                                     >
                                 </li>
                             </ul>
