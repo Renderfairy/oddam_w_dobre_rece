@@ -206,15 +206,11 @@ document.addEventListener("DOMContentLoaded", function() {
               .then(response => response.text())
               .then(data => document.getElementById("inst").innerHTML = data)
 
-          let formData = new FormData(document.getElementById('addDonation'));
-          let dataList = []
+          // let formData = new FormData(document.getElementById('addDonation'));
+          let quantity = document.getElementById('id_quantity').value
+          console.log(quantity)
 
-          formData.forEach(field => dataList.push(field))
-          console.log(formData.values())
-          console.log(dataList)
-          // for (let field of formData) {
-          //   console.log(field[0], field[1])
-          // }
+          // quantity.innerText = document.getElementsByName('quantity').value
 
           this.updateForm();
         });
@@ -249,6 +245,18 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$step.innerText = this.currentStep;
 
       // TODO: Validation
+      if (this.currentStep==5) {
+        let formData = new FormData(document.getElementById('addDonation'));
+        // let form_lis = document.querySelectorAll('.summary li')
+
+        console.log(formData.get('organization'))
+        // let values = Array.from(formData.values())
+        // for (let i=1; i<values.length;i++) {
+        //   console.log(form_lis[i])
+        //   console.log(values[i])
+        //   form_lis[i].innerText = values[i];
+        // }
+      }
 
       this.slides.forEach(slide => {
         slide.classList.remove("active");
