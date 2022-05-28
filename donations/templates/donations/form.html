@@ -31,7 +31,7 @@
 
             <form action="" method="POST" enctype="multipart/form-data" id="addDonation">
                 <!-- STEP 1: class .active is switching steps -->
-            {% csrf_token %}
+{#            {% csrf_token %}#}
                 <div data-step="1" class="active">
                     <h3>Zaznacz co chcesz oddać:</h3>
                     {% for category in categories %}
@@ -78,7 +78,7 @@
                 <div data-step="3">
                     <h3>Wybierz organizacje, której chcesz pomóc:</h3>
                     <div id="inst">
-
+                        {% include 'api_institutions.html' %}
                     </div>
 
                     <div class="form-group form-group--buttons">
@@ -146,10 +146,10 @@
                     <div class="summary">
                         <div class="form-section">
                             <h4>Oddajesz:</h4>
-                            <ul>
+                            <ul id="summary_1">
                                 <li>
                                     <span class="icon icon-bag"></span>
-                                    <span class="summary--text"
+                                    <span class="summary--text" id="quantity-summary"
                                     >4 worki ubrań w dobrym stanie dla dzieci</span
                                     >
                                 </li>
@@ -167,21 +167,19 @@
                             <div class="form-section--column">
                                 <h4>Adres odbioru:</h4>
                                 <ul>
-                                    <li>Prosta 51</li>
-                                    <li>Warszawa</li>
-                                    <li>99-098</li>
-                                    <li>123 456 789</li>
+                                    <li id="street">Prosta 51</li>
+                                    <li id="city">Warszawa</li>
+                                    <li id="postal">99-098</li>
+                                    <li id="phone">123 456 789</li>
                                 </ul>
                             </div>
 
                             <div class="form-section--column">
                                 <h4>Termin odbioru:</h4>
                                 <ul>
-                                    <li>13/12/2018</li>
-                                    <li>15:40</li>
-                                    <li>Brak uwag</li>
-                                    <li></li>
-                                    <li></li>
+                                    <li id="pickup-date">13/12/2018</li>
+                                    <li id="pickup-time">15:40</li>
+                                    <li id="pickup-comment">Brak uwag</li>
                                 </ul>
                             </div>
                         </div>

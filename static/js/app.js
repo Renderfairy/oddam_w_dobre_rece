@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", function() {
           e.preventDefault();
           this.currentStep++;
 
-          let ids = get_checked_checkboxes();
+          let ids = get_checked_category_checkboxes();
           let params = new URLSearchParams();
           ids.forEach(id => params.append("category_ids", id));
           let address = '/donation?'+ params.toString();
@@ -206,22 +206,41 @@ document.addEventListener("DOMContentLoaded", function() {
               .then(response => response.text())
               .then(data => document.getElementById("inst").innerHTML = data)
 
-          // let formData = new FormData(document.getElementById('addDonation'));
-          let quantity = document.getElementById('id_quantity').value
-          console.log(quantity)
+          document.querySelector('#summary_1').firstElementChild.lastElementChild.innerText = document.querySelector('#id_quantity').value + ' worki';;
+          let second_li = document.querySelector('#summary_1').lastElementChild.lastElementChild;
+          let organization = document.querySelector('input[name="organization"]:checked');
+          document.querySelector('#street').innerText = document.querySelector('#id_address').value;
+          document.querySelector('#city').innerText = document.querySelector('#id_city').value;
+          document.querySelector('#postal').innerText = document.querySelector('#id_zip_code').value;
+          document.querySelector('#phone').innerText = document.querySelector('#id_phone_number').value;
+          document.querySelector('#pickup-date').innerText = document.querySelector('#id_picup_date').value;
+          document.querySelector('#pickup-time').innerText = document.querySelector('#id_picup_time').value;
+          document.querySelector('#pickup-comment').innerText = document.querySelector('#id_picup_comment').value;
 
-          // quantity.innerText = document.getElementsByName('quantity').value
-
+          if (organization != null) {
+            second_li.innerText = organization.nextElementSibling.nextElementSibling.firstElementChild.innerText;
+          }
           this.updateForm();
         });
       });
 
-      function get_checked_checkboxes() {
+      function get_checked_category_checkboxes() {
         const checkboxes = document.querySelectorAll('input[name="categories"]:checked');
         const ids = [];
         checkboxes.forEach(checkbox => ids.push(checkbox.value));
-        console.log(ids);
+        // console.log(ids);
         return ids
+      }
+
+      function get_checked_organization_checkbox() {
+
+
+        organizations.forEach(function (organization) {
+          if (organization.checked) {
+            return organization;
+          }
+        });
+
       }
 
       // Previous step
@@ -245,18 +264,6 @@ document.addEventListener("DOMContentLoaded", function() {
       this.$step.innerText = this.currentStep;
 
       // TODO: Validation
-      if (this.currentStep==5) {
-        let formData = new FormData(document.getElementById('addDonation'));
-        // let form_lis = document.querySelectorAll('.summary li')
-
-        console.log(formData.get('organization'))
-        // let values = Array.from(formData.values())
-        // for (let i=1; i<values.length;i++) {
-        //   console.log(form_lis[i])
-        //   console.log(values[i])
-        //   form_lis[i].innerText = values[i];
-        // }
-      }
 
       this.slides.forEach(slide => {
         slide.classList.remove("active");

@@ -54,9 +54,9 @@ class AddDonationView(LoginRequiredMixin, View, FormMixin):
         if len(category_ids) != 0 and category_ids is not None:
             institutions = models.Institution.objects.filter(categories__in=category_ids).distinct()
             print({'categories': categories, 'institutions': institutions})
-            return render(request, 'api_intitutions.html', {'categories': categories, 'institutions': institutions, 'form': self.form_class})
+            return render(request, 'api_institutions.html', {'css_class': 'header--form-page', categories: 'categories', 'institutions': institutions, 'form': self.form_class})
 
-        return render(request, 'donations/form.html', {'categories': categories, 'institutions': institutions, 'form': self.form_class})
+        return render(request, 'donations/form.html', {'css_class': 'header--form-page', 'categories': categories, 'institutions': institutions, 'form': self.form_class})
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
