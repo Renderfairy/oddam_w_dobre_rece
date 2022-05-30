@@ -199,6 +199,10 @@ document.addEventListener("DOMContentLoaded", function() {
           this.currentStep++;
 
           let ids = get_checked_category_checkboxes();
+          if (ids.length < 1) {
+            alert('Wybierz przynajmniej jedną ktegorię!');
+            return;
+          }
           let params = new URLSearchParams();
           ids.forEach(id => params.append("category_ids", id));
           let address = '/donation?'+ params.toString();
@@ -206,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function() {
               .then(response => response.text())
               .then(data => document.getElementById("inst").innerHTML = data)
 
-          document.querySelector('#summary_1').firstElementChild.lastElementChild.innerText = document.querySelector('#id_quantity').value + ' worki';;
+          document.querySelector('#summary_1').firstElementChild.lastElementChild.innerText = document.querySelector('#id_quantity').value + ' worki';
           let second_li = document.querySelector('#summary_1').lastElementChild.lastElementChild;
           let organization = document.querySelector('input[name="organization"]:checked');
           document.querySelector('#street').innerText = document.querySelector('#id_address').value;
@@ -216,10 +220,10 @@ document.addEventListener("DOMContentLoaded", function() {
           document.querySelector('#pickup-date').innerText = document.querySelector('#id_picup_date').value;
           document.querySelector('#pickup-time').innerText = document.querySelector('#id_picup_time').value;
           document.querySelector('#pickup-comment').innerText = document.querySelector('#id_picup_comment').value;
-
           if (organization != null) {
             second_li.innerText = organization.nextElementSibling.nextElementSibling.firstElementChild.innerText;
           }
+
           this.updateForm();
         });
       });
@@ -230,17 +234,6 @@ document.addEventListener("DOMContentLoaded", function() {
         checkboxes.forEach(checkbox => ids.push(checkbox.value));
         // console.log(ids);
         return ids
-      }
-
-      function get_checked_organization_checkbox() {
-
-
-        organizations.forEach(function (organization) {
-          if (organization.checked) {
-            return organization;
-          }
-        });
-
       }
 
       // Previous step
@@ -265,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
       // TODO: Validation
 
-      this.slides.forEach(slide => {
+     this.slides.forEach(slide => {
         slide.classList.remove("active");
 
         if (slide.dataset.step == this.currentStep) {
@@ -286,6 +279,30 @@ document.addEventListener("DOMContentLoaded", function() {
       e.preventDefault();
       this.currentStep++;
       this.updateForm();
+      const formData = new FormData(e);
+      fetch('/donation/success', {
+        method: 'POST',
+        body: formData
+      })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Success:', data);
+          })
+          .catch(error => {
+            console.log('Error:', error)
+          });
+      // const formData = new FormData()
+      // formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+      // formData.append()
+      // console.log(formData);
+      // fetch('donation', {
+      //   method: 'POST',
+      //   body: formData
+      // })
+      //     .then(response => response.json())
+      //     .then(data => {
+      //       console.log('Success', data)
+      //     });
     }
   }
   const form = document.querySelector(".form--steps");

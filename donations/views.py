@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -53,20 +53,22 @@ class AddDonationView(LoginRequiredMixin, View, FormMixin):
         institutions = models.Institution.objects.all()
         if len(category_ids) != 0 and category_ids is not None:
             institutions = models.Institution.objects.filter(categories__in=category_ids).distinct()
-            print({'categories': categories, 'institutions': institutions})
             return render(request, 'api_institutions.html', {'css_class': 'header--form-page', categories: 'categories', 'institutions': institutions, 'form': self.form_class})
 
         return render(request, 'donations/form.html', {'css_class': 'header--form-page', 'categories': categories, 'institutions': institutions, 'form': self.form_class})
 
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
+    def post(self, request):
+        form = forms.AddDonationForm(data=request.POST)
         if form.is_valid():
             donation = form.save(commit=False)
-            donation.user = request.user
-            donation.categories = request.categories
-            donation.institution = request.institution
+            donation.user = request.POST.get('user')
+            print(donation.user)
+            donation.categories = request.POST.get('categories')
+            print(donation.categories)
+            donation.institution = request.POST.get('institution')
+            print(donation.institution)
             donation.save()
-            return redirect(reverse_lazy('donations:landing_page'))
+            return HttpResponseRedirect('/donation/success')
         else:
             return render(request, 'donations/form.html', {'form': form})
 
@@ -111,5 +113,9 @@ class RegisterView(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('donations:login')
     form_class = forms.UserRegisterForm
     success_message = 'Twoje konto zostało stworzone'
+
+
+class SuccessAddDonationView(TemplateView):
+    template_name = 'donations/form-confirmation.html'
 
 

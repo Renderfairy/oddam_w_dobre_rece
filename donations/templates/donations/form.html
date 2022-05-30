@@ -29,9 +29,9 @@
         <div class="form--steps-container">
             <div class="form--steps-counter">Krok <span>1</span>/5</div>
 
-            <form action="" method="POST" enctype="multipart/form-data" id="addDonation">
+            <form action="{% url 'donations:success_add_donation' %}" method="POST" enctype="multipart/form-data" id="addDonation">
                 <!-- STEP 1: class .active is switching steps -->
-{#            {% csrf_token %}#}
+                {% csrf_token %}
                 <div data-step="1" class="active">
                     <h3>Zaznacz co chcesz oddać:</h3>
                     {% for category in categories %}
