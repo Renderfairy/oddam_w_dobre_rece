@@ -1,15 +1,15 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
+from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView, CreateView
-from django.db.models import Sum, Count
+from django.db.models import Sum
 from django.db.models.functions import Length
-from django.db.models import F
 
 
 from random import sample
@@ -43,7 +43,7 @@ class LandingPageView(TemplateView):
         return context
 
 
-class AddDonationView(LoginRequiredMixin, View, FormMixin):
+class AddDonationView(LoginRequiredMixin, FormMixin, View):
     login_url = reverse_lazy('donations:login')
     form_class = forms.AddDonationForm
 
@@ -58,31 +58,20 @@ class AddDonationView(LoginRequiredMixin, View, FormMixin):
         return render(request, 'donations/form.html', {'css_class': 'header--form-page', 'categories': categories, 'institutions': institutions, 'form': self.form_class})
 
     def post(self, request):
-        form = forms.AddDonationForm(data=request.POST)
+        form = forms.AddDonationForm(self.request.POST)
+
+        # print(request.POST)
+        # print(form.is_valid(), form.errors)
+        # print(institution)
         if form.is_valid():
             donation = form.save(commit=False)
-            donation.user = request.POST.get('user')
-            print(donation.user)
-            donation.categories = request.POST.get('categories')
-            print(donation.categories)
-            donation.institution = request.POST.get('institution')
-            print(donation.institution)
+            donation.user = request.user
+            donation.phone_number = request.POST['phone_number']
             donation.save()
-            return HttpResponseRedirect('/donation/success')
+            donation.categories.set(request.POST.getlist('categories'))
+            return redirect('donations:success_add_donation')
         else:
             return render(request, 'donations/form.html', {'form': form})
-
-    # def post(self, request):
-    #     form = forms.AddDonationForm(request.POST or None)
-    #     if form.is_valid():
-    #         donation = form.save(commit=False)
-    #         donation.user = request.user
-    #         print(donation)
-    #         donation.save()
-    #         return redirect(reverse_lazy('donations:landing_page'))
-    #     else:
-    #         form = forms.AddDonationForm
-    #         return render(request, 'donations/form.html', {'form': form})
 
 
 class DonationsLoginView(LoginView):
@@ -117,5 +106,3 @@ class RegisterView(SuccessMessageMixin, CreateView):
 
 class SuccessAddDonationView(TemplateView):
     template_name = 'donations/form-confirmation.html'
-
-

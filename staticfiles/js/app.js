@@ -197,9 +197,46 @@ document.addEventListener("DOMContentLoaded", function() {
         btn.addEventListener("click", e => {
           e.preventDefault();
           this.currentStep++;
+          if (this.currentStep === 2) {
+            let ids = get_checked_category_checkboxes();
+            if (ids.length < 1) {
+              alert('Wybierz przynajmniej jedną ktegorię!');
+              return;
+            }
+            let params = new URLSearchParams();
+            ids.forEach(id => params.append("category_ids", id));
+            let address = '/donation?' + params.toString();
+            fetch(address)
+                .then(response => response.text())
+                .then(data => document.getElementById("inst").innerHTML = data)
+          }
+          if (this.currentStep === 5 ) {
+            document.querySelector('#summary_1').firstElementChild.lastElementChild.innerText = document.querySelector('#id_quantity').value + ' worki';
+            let second_li = document.querySelector('#summary_1').lastElementChild.lastElementChild;
+            let organization = document.querySelector('input[name="organization"]:checked');
+            document.querySelector('#street').innerText = document.querySelector('#id_address').value;
+            document.querySelector('#city').innerText = document.querySelector('#id_city').value;
+            document.querySelector('#postal').innerText = document.querySelector('#id_zip_code').value;
+            document.querySelector('#phone').innerText = document.querySelector('#id_phone_number').value;
+            document.querySelector('#pickup-date').innerText = document.querySelector('#id_picup_date').value;
+            document.querySelector('#pickup-time').innerText = document.querySelector('#id_picup_time').value;
+            document.querySelector('#pickup-comment').innerText = document.querySelector('#id_picup_comment').value;
+            if (organization != null) {
+              second_li.innerText = organization.nextElementSibling.nextElementSibling.firstElementChild.innerText;
+            }
+          }
+
           this.updateForm();
         });
       });
+
+      function get_checked_category_checkboxes() {
+        const checkboxes = document.querySelectorAll('input[name="categories"]:checked');
+        const ids = [];
+        checkboxes.forEach(checkbox => ids.push(checkbox.value));
+        // console.log(ids);
+        return ids
+      }
 
       // Previous step
       this.$prev.forEach(btn => {
@@ -223,7 +260,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
       // TODO: Validation
 
-      this.slides.forEach(slide => {
+     this.slides.forEach(slide => {
         slide.classList.remove("active");
 
         if (slide.dataset.step == this.currentStep) {
@@ -233,33 +270,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
       this.$stepInstructions[0].parentElement.parentElement.hidden = this.currentStep >= 6;
       this.$step.parentElement.hidden = this.currentStep >= 6;
-
-      // TODO: get data from inputs and show them in summary
-
-      function show_id(event) {
-        let ids = get_checked_checkboxes();
-        let params = new URLSearchParams();
-        ids.forEach(id => params.append("category_ids", id));
-        let address = '/donation?'+ params.toString();
-        fetch(address)
-            .then(response => response.text())
-            .then(data => document.getElementById("category-check").innerHTML = data);
-      }
-
-      function get_checked_checkboxes()
-      {
-        let markedCheckbox = document.querySelectorAll('input[type="checkbox"]:checked');
-        let ids = [];
-        markedCheckbox.forEach(box => ids.push(box.value));
-        console.log(ids);
-        return ids;
-      }
-
-      // $( document ).ready(function () {
-      //   let span_buttons = $('.checkbox');
-      //   span_buttons.click(show_id);
-      // });
-
     }
 
     /**
@@ -269,6 +279,40 @@ document.addEventListener("DOMContentLoaded", function() {
      */
     submit(e) {
       e.preventDefault();
+
+      let categories = document.querySelectorAll('input[name="categories"]:checked');
+
+      let quantity = document.querySelector('#id_quantity').value;
+      let organization = document.querySelector('input[name="organization"]:checked').value;
+      let address = document.querySelector('#id_address').value;
+      let city = document.querySelector('#id_city').value;
+      let postal = document.querySelector('#id_zip_code').value;
+      let phone = document.querySelector('#id_phone_number').value;
+      let date = document.querySelector('#id_picup_date').value;
+      let time = document.querySelector('#id_picup_time').value;
+      let comment = document.querySelector('#id_picup_comment').value;
+      const formData = new FormData()
+      formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+      categories.forEach(data => formData.append('categories', data.value));
+      formData.append('quantity', quantity);
+      formData.append('institution', organization);
+      formData.append('address', address);
+      formData.append('city', city);
+      formData.append('zip_code', postal);
+      formData.append('phone_number', phone);
+      formData.append('picup_date', date);
+      formData.append('picup_time', time);
+      formData.append('picup_comment', comment);
+      for (let item of formData) {
+        console.log(item[0], item[1])
+      }
+      fetch('donation', {
+        method: 'POST',
+        body: formData
+      })
+          .then(data => {
+            console.log('Success', data)
+          });
       this.currentStep++;
       this.updateForm();
     }
@@ -278,3 +322,19 @@ document.addEventListener("DOMContentLoaded", function() {
     new FormSteps(form);
   }
 });
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
