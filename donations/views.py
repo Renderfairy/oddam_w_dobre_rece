@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView, CreateView
+from django.views.generic import TemplateView, CreateView, DetailView
 from django.db.models import Sum
 from django.db.models.functions import Length
 
@@ -106,3 +106,11 @@ class RegisterView(SuccessMessageMixin, CreateView):
 
 class SuccessAddDonationView(TemplateView):
     template_name = 'donations/form-confirmation.html'
+
+
+class UserProfileView(LoginRequiredMixin, View):
+    login_url = reverse_lazy('donations:login')
+
+    def get(self, request):
+        user = request.user
+        return render(request, 'donations/user_profile.html', {'user': user})
