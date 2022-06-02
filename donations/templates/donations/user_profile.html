@@ -10,7 +10,29 @@
     <p>{{ user.email }}</p>
     </h2>
     </div>
-    <div>
-
+    <div class="container">
+    <table>
+    <th>
+        <tr class="title">
+            <td class="col"><h3>Instytucja</h3></td>
+            <td class="col"><h3>Ilość</h3></td>
+            <td class="col"><h3>Data odbioru</h3></td>
+            <td class="col"><h3>Kategoria/e</h3></td>
+        </tr>
+    </th>
+    {% for donation in donations %}
+        <tr>
+            <td>{{ donation.institution }}</td>
+            <td>{{ donation.quantity }}</td>
+            <td>{{ donation.picup_date }}</td>
+        <td>
+            {% for category in donation.categories.all %}
+                <li>{{ category.name }}</li>
+            {% endfor %}
+        </td>
+        <td><input type="checkbox" value="{{ donation.is_taken }}"></td>
+        </tr>
+    {% endfor %}
+    </table>
     </div>
 {% endblock %}

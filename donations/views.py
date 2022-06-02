@@ -113,4 +113,5 @@ class UserProfileView(LoginRequiredMixin, View):
 
     def get(self, request):
         user = request.user
-        return render(request, 'donations/user_profile.html', {'user': user})
+        user_donations = models.Donation.objects.filter(user_id=request.user).order_by('picup_date')
+        return render(request, 'donations/user_profile.html', {'user': user, 'donations': user_donations})

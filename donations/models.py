@@ -35,6 +35,7 @@ class Donation(models.Model):
     picup_time = models.TimeField()
     picup_comment = models.TextField()
     user = models.ForeignKey(get_user_model(), null=True, on_delete=models.PROTECT)
+    is_taken = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.user} {self.institution}'
