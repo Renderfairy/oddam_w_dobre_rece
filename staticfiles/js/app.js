@@ -210,17 +210,45 @@ document.addEventListener("DOMContentLoaded", function() {
                 .then(response => response.text())
                 .then(data => document.getElementById("inst").innerHTML = data)
           }
+
           if (this.currentStep === 5 ) {
             document.querySelector('#summary_1').firstElementChild.lastElementChild.innerText = document.querySelector('#id_quantity').value + ' worki';
+            if (document.querySelector('#id_quantity').value.length === 0) {
+              alert('Podaj ilosć worków w kroku 2/5!')
+            }
             let second_li = document.querySelector('#summary_1').lastElementChild.lastElementChild;
             let organization = document.querySelector('input[name="organization"]:checked');
+            if (organization == null) {
+              alert('Wybierz organizację w kroku 3/5')
+            }
             document.querySelector('#street').innerText = document.querySelector('#id_address').value;
+            if (document.querySelector('#id_address').value.length === 0) {
+              alert('Podaj ulicę, numer domu oraz mieszkania w kroku 4/5!')
+            }
             document.querySelector('#city').innerText = document.querySelector('#id_city').value;
+            if (document.querySelector('#id_zip_code').value.length === 0) {
+              alert('Wpisz miasto!')
+            }
             document.querySelector('#postal').innerText = document.querySelector('#id_zip_code').value;
+            if (document.querySelector('#id_zip_code').value.length === 0) {
+              alert('Wpisz kod pocztowy!')
+            }
             document.querySelector('#phone').innerText = document.querySelector('#id_phone_number').value;
+            if (document.querySelector('#id_phone_number').value.length === 0) {
+              alert('Wpisz numer telefonu!')
+            }
             document.querySelector('#pickup-date').innerText = document.querySelector('#id_picup_date').value;
+            if (document.querySelector('#id_picup_date').value.length === 0) {
+              alert('Wybierz datę odbioru!')
+            }
             document.querySelector('#pickup-time').innerText = document.querySelector('#id_picup_time').value;
+            if (document.querySelector('#id_picup_time').value.length === 0) {
+              alert('Wybierz godzinę odbioru!')
+            }
             document.querySelector('#pickup-comment').innerText = document.querySelector('#id_picup_comment').value;
+            if (document.querySelector('#id_picup_comment').value.length === 0) {
+              alert('Dodaj komentrz dla kuriera!')
+            }
             if (organization != null) {
               second_li.innerText = organization.nextElementSibling.nextElementSibling.firstElementChild.innerText;
             }
@@ -303,15 +331,21 @@ document.addEventListener("DOMContentLoaded", function() {
       formData.append('picup_date', date);
       formData.append('picup_time', time);
       formData.append('picup_comment', comment);
-      for (let item of formData) {
-        console.log(item[0], item[1])
-      }
+      // for (let item of formData) {
+      //   console.log(item[0], item[1])
+      // }
       fetch('donation', {
         method: 'POST',
-        body: formData
+        body: formData,
       })
           .then(data => {
             console.log('Success', data)
+            document.getElementById('form-information').innerHTML = '<div class="slogan container container--90">\n' +
+                '        <h2>\n' +
+                '            Dziękujemy za przesłanie formularza Na maila prześlemy wszelkie\n' +
+                '            informacje o odbiorze.\n' +
+                '        </h2>\n' +
+                '    </div>'
           });
       this.currentStep++;
       this.updateForm();

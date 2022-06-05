@@ -2,19 +2,17 @@ from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
-from django.template.response import TemplateResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView, CreateView, DetailView
+from django.views.generic import TemplateView, CreateView
 from django.db.models import Sum
 from django.db.models.functions import Length
 
 
 from random import sample
 
-from django.views.generic.edit import FormMixin
+from django.views.generic.edit import FormMixin, UpdateView, FormView
 
 from . import models, forms
 
@@ -52,7 +50,8 @@ class AddDonationView(LoginRequiredMixin, FormMixin, View):
         categories = models.Category.objects.all().order_by(Length('name')).reverse()
         institutions = models.Institution.objects.all()
         if len(category_ids) != 0 and category_ids is not None:
-            institutions = models.Institution.objects.filter(categories__in=category_ids).distinct()
+            for cat_id in category_ids:
+                institutions = institutions.filter(categories__id__in=[cat_id])
             return render(request, 'api_institutions.html', {'css_class': 'header--form-page', categories: 'categories', 'institutions': institutions, 'form': self.form_class})
 
         return render(request, 'donations/form.html', {'css_class': 'header--form-page', 'categories': categories, 'institutions': institutions, 'form': self.form_class})
@@ -72,6 +71,24 @@ class AddDonationView(LoginRequiredMixin, FormMixin, View):
             return redirect('donations:success_add_donation')
         else:
             return render(request, 'donations/form.html', {'form': form})
+
+
+# def edit_user_profile_view(request):
+#     if request.method == 'POST':
+#         form = forms.UserUpdateForm(request.POST, instance=request.user)
+#         if form.is_valid():
+#             if form.cleaned_data['first_name'] != request.user.first_name:
+#                 form.save()
+#             if form.cleaned_data['last_name'] != request.user.last_name:
+#                 form.save()
+#             if form.cleaned_data['username'] != request.user.username;
+#                 username = form.save(commit=False)
+#
+#
+#             return redirect(reverse_lazy('donations:user_profile'))
+#     else:
+#         form = forms.UserUpdateForm(instance=request.user)
+#         return render(request, 'donations/user-edit-form.html', {'form': form})
 
 
 class DonationsLoginView(LoginView):
@@ -113,5 +130,16 @@ class UserProfileView(LoginRequiredMixin, View):
 
     def get(self, request):
         user = request.user
-        user_donations = models.Donation.objects.filter(user_id=request.user).order_by('picup_date')
+        user_donations = models.Donation.objects.filter(user_id=request.user).order_by('is_taken', 'picup_date')
         return render(request, 'donations/user_profile.html', {'user': user, 'donations': user_donations})
+
+
+class DonationIsTakenView(LoginRequiredMixin, View):
+    login_url = reverse_lazy('donations:login')
+
+    def get(self, request, donation_id):
+        donation = get_object_or_404(models.Donation, pk=donation_id)
+        donation.is_taken = True
+        donation.save()
+        return redirect(reverse_lazy('donations:user_profile'))
+

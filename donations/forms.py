@@ -39,6 +39,18 @@ class UserRegisterForm(UserCreationForm):
             return user
 
 
+class UserUpdateForm(forms.ModelForm):
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=30)
+    username = forms.EmailInput()
+    password = forms.CharField(max_length=20, widget=forms.PasswordInput(
+        attrs={'name': 'password', 'placeholder': 'Hasło'}))
+
+    class Meta:
+        model = get_user_model()
+        fields = ['first_name', 'last_name', 'email', 'password']
+
+
 class UserLoginForm(AuthenticationForm):
     username = forms.CharField(max_length=34, widget=forms.EmailInput(attrs={'name': 'email', 'placeholder': 'Email'}))
     password = forms.CharField(max_length=20, widget=forms.PasswordInput(

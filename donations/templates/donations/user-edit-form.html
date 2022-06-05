@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Ustawienia
+{% endblock %}
+
+{% block container %}
+    <section class="login-page">
+        <h2>Edycja danych</h2>
+        {% if form.errors %}
+            {% for error, description in form.errors.items %}
+                <div>
+                    <strong class="errors">{{ description }}</strong>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <form action="" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field }}
+                </div>
+            {% endfor %}
+
+            <div class="form-group form-group--buttons">
+                <button class="btn" type="submit">Potwierdź</button>
+            </div>
+        </form>
+    </section>
+{% endblock %}
